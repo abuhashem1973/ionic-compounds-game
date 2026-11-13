@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<!-- saved from url=(0462)file:///C:/Users/k.alhawaneah2205/OneDrive%20-%20Ministry%20of%20Education%20and%20Higher%20Education/Desktop/%D9%83%D8%B1%D8%A7%D8%B3%D8%A9%20%D9%86%D9%87%D8%A7%D9%8A%D8%A9%20%D8%A7%D9%84%D9%81%D8%B5%D9%84%20%D8%A7%D9%84%D8%A3%D9%88%D9%84/10/%D9%85%D8%AA%D9%81%D8%B1%D9%82%D8%A7%D8%AA/%D9%84%D8%B9%D8%A8%D8%A9%20%D8%A7%D9%84%D8%AA%D8%B3%D9%85%D9%8A%D8%A9%20%D8%A7%D9%84%D9%83%D9%8A%D9%85%D9%8A%D8%A7%D8%A6%D9%8A%D8%A9%20%D8%A7%D9%84%D8%B0%D9%83%D9%8A%D8%A9.html -->
+<html lang="ar" dir="rtl"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>لعبة التسمية الكيميائية الذكية</title>
+    <link href="file:///C:/Users/k.alhawaneah2205/OneDrive%20-%20Ministry%20of%20Education%20and%20Higher%20Education/Desktop/%D9%83%D8%B1%D8%A7%D8%B3%D8%A9%20%D9%86%D9%87%D8%A7%D9%8A%D8%A9%20%D8%A7%D9%84%D9%81%D8%B5%D9%84%20%D8%A7%D9%84%D8%A3%D9%88%D9%84/10/%D9%85%D8%AA%D9%81%D8%B1%D9%82%D8%A7%D8%AA/%D9%84%D8%B9%D8%A8%D8%A9%20%D8%A7%D9%84%D8%AA%D8%B3%D9%85%D9%8A%D8%A9%20%D8%A7%D9%84%D9%83%D9%8A%D9%85%D9%8A%D8%A7%D8%A6%D9%8A%D8%A9%20%D8%A7%D9%84%D8%B0%D9%83%D9%8A%D8%A9_files/css2" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #F4F6F8; --panel-bg: #FFFFFF;
+            --cation-color: #7EB5A6; --cation-light: #D4EDED; --cation-dark: #5A8E7F;
+            --anion-color: #E27D60; --anion-light: #FFDAB9; --anion-dark: #C46A4F;
+            --text: #2C3E50; --text-light: #8899A6; --success: #2CB67D;
+            --primary: #6C63FF; --primary-light: #EEECFF;
+            --unit: 46px; 
+            --ion-w: 70px; 
+            --tab-w: 14px; 
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        body { font-family: 'Cairo', sans-serif; background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+        /* نظام الشبكة الرئيسي للـ Desktop */
+        .app-grid { display: grid; grid-template-columns: 230px 1fr 230px; height: 100vh; gap: 12px; padding: 10px; }
+
+        /* استخدام خاصية order لكسر توجيه المتصفح الافتراضي وإجبار الكاتيونات على اليسار المطلق */
+        .panel.left-side { order: 3; }  /* ستظهر أقصى اليسار بصرياً في بيئة RTL */
+        .workspace { order: 2; }        /* في المنتصف */
+        .panel.right-side { order: 1; } /* ستظهر أقصى اليمين بصرياً في بيئة RTL */
+
+        .panel { background: var(--panel-bg); border-radius: 18px; box-shadow: 0 4px 18px rgba(0,0,0,0.06); display: flex; flex-direction: column; overflow: hidden; }
+        .panel-header { padding: 14px; font-weight: 700; font-size: 1em; text-align: center; }
+        
+        /* ألوان لوحة الكاتيونات */
+        .panel.left-side .panel-header { background: var(--cation-light); color: var(--cation-dark); border-bottom: 3px solid var(--cation-color); }
+        /* ألوان لوحة الأنيونات */
+        .panel.right-side .panel-header { background: var(--anion-light); color: var(--anion-dark); border-bottom: 3px solid var(--anion-color); }
+
+        .scroll { flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+        .scroll::-webkit-scrollbar { width: 5px; }
+        .scroll::-webkit-scrollbar-thumb { background: #ddd; border-radius: 6px; }
+
+        .source-card {
+            display: flex; align-items: center; gap: 10px; padding: 8px;
+            border-radius: 12px; cursor: grab; touch-action: none; user-select: none;
+            transition: transform 0.15s, box-shadow 0.15s; border: 2px solid transparent;
+        }
+        .source-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,0,0,0.1); }
+        .source-card.cation { border-color: var(--cation-light); }
+        .source-card.anion { border-color: var(--anion-light); }
+        .source-card svg { flex-shrink: 0; }
+        .source-card .info { flex: 1; min-width: 0; }
+        .source-card .info .name { font-weight: 600; font-size: 0.85em; }
+        .source-card .info .charge { font-size: 0.7em; color: var(--text-light); direction: ltr; }
+
+        .workspace { background: var(--panel-bg); border-radius: 18px; box-shadow: 0 4px 18px rgba(0,0,0,0.06); display: flex; flex-direction: column; overflow: hidden; }
+        .ws-header { padding: 10px 16px; display: flex; justify-content: space-between; align-items: center; background: #f8f8f8; border-bottom: 1px solid #eee; }
+        .ws-header .title { font-weight: 700; color: var(--primary); font-size: 1em; }
+        
+        .game-controls { display: flex; gap: 8px; }
+        .btn-game { padding: 6px 14px; border: none; border-radius: 8px; cursor: pointer; font-family: 'Cairo'; font-weight: 700; font-size: 0.8em; transition: 0.2s; }
+        .btn-reset { background: #eee; color: var(--text); }
+        .btn-next { background: var(--success); color: white; display: none; animation: pulse 1.5s infinite; }
+        .btn-hint { background: var(--primary-light); color: var(--primary); }
+
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+
+        .challenge-banner {
+            background: var(--primary-light); color: var(--primary); padding: 12px; margin: 12px 12px 0;
+            border-radius: 14px; display: flex; justify-content: space-between; align-items: center;
+            border: 1px solid rgba(108, 99, 255, 0.2);
+        }
+        .challenge-info .level-indicator { font-size: 0.75em; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; background: rgba(108, 99, 255, 0.15); padding: 2px 8px; border-radius: 20px; width: fit-content; margin-bottom: 2px;}
+        .challenge-info .target-text { font-size: 1.1em; font-weight: 800; color: #3F3D56; }
+        .score-badge { background: white; padding: 4px 12px; border-radius: 10px; font-weight: 700; font-size: 0.9em; box-shadow: 0 2px 8px rgba(108,99,255,0.1); }
+
+        .ws-body { flex: 1; display: flex; position: relative; justify-content: center; align-items: flex-end; padding: 0 20px 20px; overflow: hidden; }
+        
+        /* ضبط تموضع تجميع الأيونات المسحوبة في المنتصف لتتوافق مع اليمين واليسار */
+        .stack { display: flex; flex-direction: column-reverse; gap: 0; min-height: 60px; z-index: 10; position: absolute; bottom: 20px; }
+        .stack.cation { right: 50%; align-items: flex-end; }     /* الكاتيونات المتراصة تسحب وتتراص نحو اليسار */
+        .stack.anion { left: 50%; align-items: flex-start; }     /* الأنيونات المتراصة تسحب وتتراص نحو اليمين */
+
+        .center-line {
+            position: absolute; left: 50%; top: 10px; bottom: 20px; width: 2px;
+            background: repeating-linear-gradient(180deg, #ccc 0, #ccc 8px, transparent 8px, transparent 16px);
+            transform: translateX(-50%); z-index: 5;
+        }
+
+        .piece-row { display: flex; align-items: flex-end; animation: piecePop 0.25s cubic-bezier(0.34,1.56,0.64,1); }
+        .piece-row svg { cursor: pointer; display: block; overflow: visible; }
+        .piece-row svg:hover { filter: brightness(1.03); }
+        @keyframes piecePop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .ws-footer { padding: 12px 16px; border-top: 1px solid #eee; background: #f8f8f8; display: flex; flex-direction: column; gap: 8px; }
+        .meter { height: 6px; background: #e8e8e8; border-radius: 3px; overflow: hidden; }
+        .meter-fill { height: 100%; background: var(--success); width: 0%; transition: width 0.4s ease; border-radius: 3px; }
+        .status-text { font-size: 0.8em; color: var(--text-light); text-align: center; }
+        
+        .formula-box {
+            text-align: center; padding: 10px; background: #fff; border-radius: 12px; border: 2px dashed #ddd; min-height: 85px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; transition: 0.3s;
+        }
+        .formula-box.balanced { border-color: var(--success); background: rgba(44,182,125,0.06); }
+        .formula-box.wrong-match { border-color: var(--anion-color); background: rgba(226,125,96,0.06); }
+        .formula-text { font-size: 2.2em; font-weight: 800; direction: ltr; line-height: 1; margin-bottom: 6px; }
+        .compound-name { font-size: 0.95em; font-weight: 700; color: var(--text); }
+        .compound-name-en { font-size: 0.8em; color: var(--text-light); margin-top: 1px; font-weight: 600; }
+
+        .drag-clone { position: fixed; pointer-events: none; z-index: 9999; transform: translate3d(-50%, -50%, 0) scale(1.05); opacity: 0.85; filter: drop-shadow(0 8px 16px rgba(0,0,0,0.2)); }
+        .confetti { position: fixed; width: 8px; height: 8px; pointer-events: none; z-index: 10000; border-radius: 2px; animation: confettiFall 1s ease-out forwards; }
+        @keyframes confettiFall { 0% { transform: translate(0,0) rotate(0); opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) rotate(var(--r)); opacity: 0; } }
+
+        @media (max-width: 850px) {
+            .app-grid { grid-template-columns: 1fr; grid-template-rows: auto auto 1fr auto; height: 100vh; }
+            .panel { flex-direction: row; max-height: 90px; }
+            .panel-header { display: none; }
+            .scroll { flex-direction: row; overflow-x: auto; overflow-y: hidden; align-items: center; padding: 5px; }
+            .source-card { min-width: 110px; padding: 4px; gap: 5px; }
+            .challenge-banner { margin: 6px; padding: 8px; }
+            .challenge-info .target-text { font-size: 0.95em; }
+            /* ترتيب الاستجابة للهواتف المحمولة بشكل طولي */
+            .panel.left-side { order: 1; grid-row: 1; }
+            .panel.right-side { order: 2; grid-row: 2; }
+            .workspace { order: 3; grid-row: 3; }
+        }
+    </style></head><body>
+    <div class="app-grid">
+        <!-- الكاتيونات: مبرمجة هندسياً لتستقر يسار الشاشة تماماً -->
+        <aside class="panel left-side">
+            <div class="panel-header">⚡ الكاتيونات (الموجبة)</div>
+            <div class="scroll" id="cationList"><div class="source-card cation" data-type="cation" data-id="na" style="opacity: 1;"><svg viewBox="0 0 42 27.599999999999998" width="42" height="27.599999999999998" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 0 27.599999999999998 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="11.399999999999999" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Na</text>
+                <text x="15.120000000000001" y="21" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">1+</text>
+            </svg><div class="info"><div class="name">صوديوم</div><div class="charge">1+</div></div></div><div class="source-card cation" data-type="cation" data-id="k" style="opacity: 1;"><svg viewBox="0 0 42 27.599999999999998" width="42" height="27.599999999999998" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 0 27.599999999999998 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="11.399999999999999" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">K</text>
+                <text x="15.120000000000001" y="21" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">1+</text>
+            </svg><div class="info"><div class="name">بوتاسيوم</div><div class="charge">1+</div></div></div><div class="source-card cation" data-type="cation" data-id="mg" style="opacity: 1;"><svg viewBox="0 0 42 55.199999999999996" width="42" height="55.199999999999996" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 42 33.12 L 33.6 33.12 L 33.6 49.67999999999999 L 42 49.67999999999999 L 42 55.199999999999996 L 0 55.199999999999996 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="25.2" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Mg</text>
+                <text x="15.120000000000001" y="34.8" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">2+</text>
+            </svg><div class="info"><div class="name">مغنيسيوم</div><div class="charge">2+</div></div></div><div class="source-card cation" data-type="cation" data-id="ca" style="opacity: 1;"><svg viewBox="0 0 42 55.199999999999996" width="42" height="55.199999999999996" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 42 33.12 L 33.6 33.12 L 33.6 49.67999999999999 L 42 49.67999999999999 L 42 55.199999999999996 L 0 55.199999999999996 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="25.2" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Ca</text>
+                <text x="15.120000000000001" y="34.8" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">2+</text>
+            </svg><div class="info"><div class="name">كالسيوم</div><div class="charge">2+</div></div></div><div class="source-card cation" data-type="cation" data-id="al" style="opacity: 1;"><svg viewBox="0 0 42 82.8" width="42" height="82.8" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 42 33.12 L 33.6 33.12 L 33.6 49.67999999999999 L 42 49.67999999999999 L 42 55.199999999999996 L 42 60.72 L 33.6 60.72 L 33.6 77.28 L 42 77.28 L 42 82.8 L 0 82.8 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="39" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Al</text>
+                <text x="15.120000000000001" y="48.599999999999994" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">3+</text>
+            </svg><div class="info"><div class="name">ألومنيوم</div><div class="charge">3+</div></div></div><div class="source-card cation" data-type="cation" data-id="fe2" style="opacity: 1;"><svg viewBox="0 0 42 55.199999999999996" width="42" height="55.199999999999996" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 42 33.12 L 33.6 33.12 L 33.6 49.67999999999999 L 42 49.67999999999999 L 42 55.199999999999996 L 0 55.199999999999996 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="25.2" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Fe</text>
+                <text x="15.120000000000001" y="34.8" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">2+</text>
+            </svg><div class="info"><div class="name">حديد II</div><div class="charge">2+</div></div></div><div class="source-card cation" data-type="cation" data-id="fe3" style="opacity: 1;"><svg viewBox="0 0 42 82.8" width="42" height="82.8" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 42 33.12 L 33.6 33.12 L 33.6 49.67999999999999 L 42 49.67999999999999 L 42 55.199999999999996 L 42 60.72 L 33.6 60.72 L 33.6 77.28 L 42 77.28 L 42 82.8 L 0 82.8 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="39" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Fe</text>
+                <text x="15.120000000000001" y="48.599999999999994" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">3+</text>
+            </svg><div class="info"><div class="name">حديد III</div><div class="charge">3+</div></div></div><div class="source-card cation" data-type="cation" data-id="cu2" style="opacity: 1;"><svg viewBox="0 0 42 55.199999999999996" width="42" height="55.199999999999996" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 42 33.12 L 33.6 33.12 L 33.6 49.67999999999999 L 42 49.67999999999999 L 42 55.199999999999996 L 0 55.199999999999996 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="25.2" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Cu</text>
+                <text x="15.120000000000001" y="34.8" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">2+</text>
+            </svg><div class="info"><div class="name">نحاس II</div><div class="charge">2+</div></div></div><div class="source-card cation" data-type="cation" data-id="zn" style="opacity: 1;"><svg viewBox="0 0 42 55.199999999999996" width="42" height="55.199999999999996" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 42 33.12 L 33.6 33.12 L 33.6 49.67999999999999 L 42 49.67999999999999 L 42 55.199999999999996 L 0 55.199999999999996 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="25.2" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Zn</text>
+                <text x="15.120000000000001" y="34.8" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">2+</text>
+            </svg><div class="info"><div class="name">زنك</div><div class="charge">2+</div></div></div><div class="source-card cation" data-type="cation" data-id="ag" style="opacity: 1;"><svg viewBox="0 0 42 27.599999999999998" width="42" height="27.599999999999998" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 0 27.599999999999998 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="11.399999999999999" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Ag</text>
+                <text x="15.120000000000001" y="21" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">1+</text>
+            </svg><div class="info"><div class="name">فضة</div><div class="charge">1+</div></div></div><div class="source-card cation" data-type="cation" data-id="nh4" style="opacity: 1;"><svg viewBox="0 0 42 27.599999999999998" width="42" height="27.599999999999998" style="overflow:visible;">
+                <path d="M 0 0 L 42 0 L 42 5.52 L 33.6 5.52 L 33.6 22.08 L 42 22.08 L 42 27.599999999999998 L 0 27.599999999999998 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="15.120000000000001" y="11.399999999999999" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">NH₄</text>
+                <text x="15.120000000000001" y="21" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">1+</text>
+            </svg><div class="info"><div class="name">أمونيوم</div><div class="charge">1+</div></div></div></div>
+        </aside>
+
+        <!-- مساحة العمل واللعب في المنتصف دائماً -->
+        <main class="workspace">
+            <div class="ws-header">
+                <span class="title">🎮 مختبر الكيمياء الذكي</span>
+                <div class="game-controls">
+                    <button class="btn-game btn-hint" onclick="game.showHint()">💡 مساعدة</button>
+                    <button class="btn-game btn-reset" onclick="app.reset()">🔄 مسح</button>
+                    <button class="btn-game btn-next" id="btnNext" onclick="game.nextLevel()" style="display: none;">🎮 المرحلة التالية ➔</button>
+                </div>
+            </div>
+            
+            <div class="challenge-banner">
+                <div class="challenge-info">
+                    <div class="level-indicator" id="levelIndicator">المرحلة 1 / 10</div>
+                    <div class="target-text" id="targetChallenge">مطلوب بناء: كلوريد الصوديوم</div>
+                </div>
+                <div class="score-badge" id="scoreBadge">النقاط: 0</div>
+            </div>
+
+            <div class="ws-body" id="wsBody">
+                <div class="stack cation" id="cationStack"><div class="piece-row cation"><svg viewBox="0 0 70 138" width="70" height="138" style="overflow:visible;">
+                <path d="M 0 0 L 70 0 L 70 9.200000000000001 L 56 9.200000000000001 L 56 36.800000000000004 L 70 36.800000000000004 L 70 46 L 70 55.2 L 56 55.2 L 56 82.80000000000001 L 70 82.80000000000001 L 70 92 L 70 101.2 L 56 101.2 L 56 128.8 L 70 128.8 L 70 138 L 0 138 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="25.2" y="65" text-anchor="middle" fill="white" font-weight="800" font-size="15" font-family="Cairo">Al</text>
+                <text x="25.2" y="81" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Cairo">3+</text>
+            </svg></div><div class="piece-row cation"><svg viewBox="0 0 70 138" width="70" height="138" style="overflow:visible;">
+                <path d="M 0 0 L 70 0 L 70 9.200000000000001 L 56 9.200000000000001 L 56 36.800000000000004 L 70 36.800000000000004 L 70 46 L 70 55.2 L 56 55.2 L 56 82.80000000000001 L 70 82.80000000000001 L 70 92 L 70 101.2 L 56 101.2 L 56 128.8 L 70 128.8 L 70 138 L 0 138 Z" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="25.2" y="65" text-anchor="middle" fill="white" font-weight="800" font-size="15" font-family="Cairo">Al</text>
+                <text x="25.2" y="81" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Cairo">3+</text>
+            </svg></div></div>
+                <div class="center-line"></div>
+                <div class="stack anion" id="anionStack"><div class="piece-row anion"><svg viewBox="0 0 70 92" width="70" height="92" style="overflow:visible;">
+                <path d="M 70 0 L 0 0 L 0 9.200000000000001 L -14 9.200000000000001 L -14 36.800000000000004 L 0 36.800000000000004 L 0 46 L 0 55.2 L -14 55.2 L -14 82.80000000000001 L 0 82.80000000000001 L 0 92 L 70 92 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="38.5" y="42" text-anchor="middle" fill="white" font-weight="800" font-size="15" font-family="Cairo">SO₄</text>
+                <text x="38.5" y="58" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Cairo">2-</text>
+            </svg></div><div class="piece-row anion"><svg viewBox="0 0 70 92" width="70" height="92" style="overflow:visible;">
+                <path d="M 70 0 L 0 0 L 0 9.200000000000001 L -14 9.200000000000001 L -14 36.800000000000004 L 0 36.800000000000004 L 0 46 L 0 55.2 L -14 55.2 L -14 82.80000000000001 L 0 82.80000000000001 L 0 92 L 70 92 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="38.5" y="42" text-anchor="middle" fill="white" font-weight="800" font-size="15" font-family="Cairo">SO₄</text>
+                <text x="38.5" y="58" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Cairo">2-</text>
+            </svg></div><div class="piece-row anion"><svg viewBox="0 0 70 92" width="70" height="92" style="overflow:visible;">
+                <path d="M 70 0 L 0 0 L 0 9.200000000000001 L -14 9.200000000000001 L -14 36.800000000000004 L 0 36.800000000000004 L 0 46 L 0 55.2 L -14 55.2 L -14 82.80000000000001 L 0 82.80000000000001 L 0 92 L 70 92 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="38.5" y="42" text-anchor="middle" fill="white" font-weight="800" font-size="15" font-family="Cairo">SO₄</text>
+                <text x="38.5" y="58" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="10" font-family="Cairo">2-</text>
+            </svg></div></div>
+            </div>
+            
+            <div class="ws-footer">
+                <div class="meter"><div class="meter-fill" id="meterFill" style="width: 100%; background: rgb(44, 182, 125);"></div></div>
+                <div class="status-text" id="statusText">⚠️ هذا مركب متزن (كبريتات الألومنيوم)، لكنه ليس المركب المطلوب في التحدي الحالي!</div>
+                <div class="formula-box wrong-match" id="formulaBox">
+                    <div class="formula-text" id="formulaText">Al<sub>2</sub>(SO₄)<sub>3</sub></div>
+                    <div class="compound-name" id="compoundName">كبريتات الألومنيوم</div>
+                    <div class="compound-name-en" id="compoundNameEn">Aluminum Sulfate</div>
+                </div>
+            </div>
+        </main>
+
+        <!-- الأنيونات: مبرمجة هندسياً لتستقر يمين الشاشة تماماً -->
+        <aside class="panel right-side">
+            <div class="panel-header">🔋 الأنيونات (السالبة)</div>
+            <div class="scroll" id="anionList"><div class="source-card anion" data-type="anion" data-id="cl" style="opacity: 1;"><svg viewBox="0 0 42 27.599999999999998" width="42" height="27.599999999999998" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 42 27.599999999999998 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="11.399999999999999" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Cl</text>
+                <text x="23.1" y="21" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">1-</text>
+            </svg><div class="info"><div class="name">كلوريد</div><div class="charge">1-</div></div></div><div class="source-card anion" data-type="anion" data-id="o" style="opacity: 1;"><svg viewBox="0 0 42 55.199999999999996" width="42" height="55.199999999999996" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 0 33.12 L -8.4 33.12 L -8.4 49.67999999999999 L 0 49.67999999999999 L 0 55.199999999999996 L 42 55.199999999999996 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="25.2" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">O</text>
+                <text x="23.1" y="34.8" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">2-</text>
+            </svg><div class="info"><div class="name">أكسيد</div><div class="charge">2-</div></div></div><div class="source-card anion" data-type="anion" data-id="f" style="opacity: 1;"><svg viewBox="0 0 42 27.599999999999998" width="42" height="27.599999999999998" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 42 27.599999999999998 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="11.399999999999999" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">F</text>
+                <text x="23.1" y="21" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">1-</text>
+            </svg><div class="info"><div class="name">فلوريد</div><div class="charge">1-</div></div></div><div class="source-card anion" data-type="anion" data-id="br" style="opacity: 1;"><svg viewBox="0 0 42 27.599999999999998" width="42" height="27.599999999999998" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 42 27.599999999999998 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="11.399999999999999" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">Br</text>
+                <text x="23.1" y="21" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">1-</text>
+            </svg><div class="info"><div class="name">بروميد</div><div class="charge">1-</div></div></div><div class="source-card anion" data-type="anion" data-id="s" style="opacity: 1;"><svg viewBox="0 0 42 55.199999999999996" width="42" height="55.199999999999996" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 0 33.12 L -8.4 33.12 L -8.4 49.67999999999999 L 0 49.67999999999999 L 0 55.199999999999996 L 42 55.199999999999996 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="25.2" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">S</text>
+                <text x="23.1" y="34.8" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">2-</text>
+            </svg><div class="info"><div class="name">كبريتيد</div><div class="charge">2-</div></div></div><div class="source-card anion" data-type="anion" data-id="no3" style="opacity: 1;"><svg viewBox="0 0 42 27.599999999999998" width="42" height="27.599999999999998" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 42 27.599999999999998 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="11.399999999999999" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">NO₃</text>
+                <text x="23.1" y="21" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">1-</text>
+            </svg><div class="info"><div class="name">نترات</div><div class="charge">1-</div></div></div><div class="source-card anion" data-type="anion" data-id="so4" style="opacity: 1;"><svg viewBox="0 0 42 55.199999999999996" width="42" height="55.199999999999996" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 0 33.12 L -8.4 33.12 L -8.4 49.67999999999999 L 0 49.67999999999999 L 0 55.199999999999996 L 42 55.199999999999996 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="25.2" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">SO₄</text>
+                <text x="23.1" y="34.8" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">2-</text>
+            </svg><div class="info"><div class="name">كبريتات</div><div class="charge">2-</div></div></div><div class="source-card anion" data-type="anion" data-id="co3" style="opacity: 1;"><svg viewBox="0 0 42 55.199999999999996" width="42" height="55.199999999999996" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 0 33.12 L -8.4 33.12 L -8.4 49.67999999999999 L 0 49.67999999999999 L 0 55.199999999999996 L 42 55.199999999999996 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="25.2" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">CO₃</text>
+                <text x="23.1" y="34.8" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">2-</text>
+            </svg><div class="info"><div class="name">كربونات</div><div class="charge">2-</div></div></div><div class="source-card anion" data-type="anion" data-id="po4" style="opacity: 1;"><svg viewBox="0 0 42 82.8" width="42" height="82.8" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 0 33.12 L -8.4 33.12 L -8.4 49.67999999999999 L 0 49.67999999999999 L 0 55.199999999999996 L 0 60.72 L -8.4 60.72 L -8.4 77.28 L 0 77.28 L 0 82.8 L 42 82.8 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="39" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">PO₄</text>
+                <text x="23.1" y="48.599999999999994" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">3-</text>
+            </svg><div class="info"><div class="name">فوسفات</div><div class="charge">3-</div></div></div><div class="source-card anion" data-type="anion" data-id="oh" style="opacity: 1;"><svg viewBox="0 0 42 27.599999999999998" width="42" height="27.599999999999998" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 42 27.599999999999998 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="11.399999999999999" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">OH</text>
+                <text x="23.1" y="21" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">1-</text>
+            </svg><div class="info"><div class="name">هيدروكسيد</div><div class="charge">1-</div></div></div><div class="source-card anion" data-type="anion" data-id="n" style="opacity: 1;"><svg viewBox="0 0 42 82.8" width="42" height="82.8" style="overflow:visible;">
+                <path d="M 42 0 L 0 0 L 0 5.52 L -8.4 5.52 L -8.4 22.08 L 0 22.08 L 0 27.599999999999998 L 0 33.12 L -8.4 33.12 L -8.4 49.67999999999999 L 0 49.67999999999999 L 0 55.199999999999996 L 0 60.72 L -8.4 60.72 L -8.4 77.28 L 0 77.28 L 0 82.8 L 42 82.8 Z" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"></path>
+                <text x="23.1" y="39" text-anchor="middle" fill="white" font-weight="800" font-size="9" font-family="Cairo">N</text>
+                <text x="23.1" y="48.599999999999994" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="6" font-family="Cairo">3-</text>
+            </svg><div class="info"><div class="name">نتريد</div><div class="charge">3-</div></div></div></div>
+        </aside>
+    </div>
+
+    <script>
+        const IONS = {
+            cations: [
+                { id:'na', symbol:'Na', name:'صوديوم', nameCompound:'الصوديوم', nameEn:'Sodium', charge:1, poly:false },
+                { id:'k', symbol:'K', name:'بوتاسيوم', nameCompound:'البوتاسيوم', nameEn:'Potassium', charge:1, poly:false },
+                { id:'mg', symbol:'Mg', name:'مغنيسيوم', nameCompound:'المغنيسيوم', nameEn:'Magnesium', charge:2, poly:false },
+                { id:'ca', symbol:'Ca', name:'كالسيوم', nameCompound:'الكالسيوم', nameEn:'Calcium', charge:2, poly:false },
+                { id:'al', symbol:'Al', name:'ألومنيوم', nameCompound:'الألومنيوم', nameEn:'Aluminum', charge:3, poly:false },
+                { id:'fe2', symbol:'Fe', name:'حديد II', nameCompound:'الحديد II', nameEn:'Iron(II)', charge:2, poly:false },
+                { id:'fe3', symbol:'Fe', name:'حديد III', nameCompound:'الحديد III', nameEn:'Iron(III)', charge:3, poly:false },
+                { id:'cu2', symbol:'Cu', name:'نحاس II', nameCompound:'النحاس II', nameEn:'Copper(II)', charge:2, poly:false },
+                { id:'zn', symbol:'Zn', name:'زنك', nameCompound:'الزنك', nameEn:'Zinc', charge:2, poly:false },
+                { id:'ag', symbol:'Ag', name:'فضة', nameCompound:'الفضة', nameEn:'Silver', charge:1, poly:false },
+                { id:'nh4', symbol:'NH₄', name:'أمونيوم', nameCompound:'الأمونيوم', nameEn:'Ammonium', charge:1, poly:true },
+            ],
+            anions: [
+                { id:'cl', symbol:'Cl', name:'كلوريد', nameEn:'Chloride', charge:1, poly:false },
+                { id:'o', symbol:'O', name:'أكسيد', nameEn:'Oxide', charge:2, poly:false },
+                { id:'f', symbol:'F', name:'فلوريد', nameEn:'Fluoride', charge:1, poly:false },
+                { id:'br', symbol:'Br', name:'بروميد', nameEn:'Bromide', charge:1, poly:false },
+                { id:'s', symbol:'S', name:'كبريتيد', nameEn:'Sulfide', charge:2, poly:false },
+                { id:'no3', symbol:'NO₃', name:'نترات', nameEn:'Nitrate', charge:1, poly:true },
+                { id:'so4', symbol:'SO₄', name:'كبريتات', nameEn:'Sulfate', charge:2, poly:true },
+                { id:'co3', symbol:'CO₃', name:'كربونات', nameEn:'Carbonate', charge:2, poly:true },
+                { id:'po4', symbol:'PO₄', name:'فوسفات', nameEn:'Phosphate', charge:3, poly:true },
+                { id:'oh', symbol:'OH', name:'هيدروكسيد', nameEn:'Hydroxide', charge:1, poly:true },
+                { id:'n', symbol:'N', name:'نتريد', nameEn:'Nitride', charge:3, poly:false },
+            ]
+        };
+
+        const GAME_LEVELS = [
+            { cation: 'na', anion: 'cl', title: 'كلوريد الصوديوم' },
+            { cation: 'mg', anion: 'o', title: 'أكسيد المغنيسيوم' },
+            { cation: 'ca', anion: 'cl', title: 'كلوريد الكالسيوم' },
+            { cation: 'k', anion: 'so4', title: 'كبريتات البوتاسيوم' },
+            { cation: 'al', anion: 'o', title: 'أكسيد الألومنيوم' },
+            { cation: 'fe2', anion: 'cl', title: 'كلوريد الحديد II' },
+            { cation: 'nh4', anion: 'no3', title: 'نترات الأمونيوم' },
+            { cation: 'cu2', anion: 'oh', title: 'هيدروكسيد النحاس II' },
+            { cation: 'al', anion: 'n', title: 'نتريد الألومنيوم' },
+            { cation: 'fe3', anion: 'po4', title: 'فوسفات الحديد III' }
+        ];
+
+        const U = 46, ION_W = 70, TAB_W = 14;
+
+        const sound = {
+            ctx: null,
+            init() { if(!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            play(type) {
+                this.init(); if(!this.ctx) return;
+                const osc = this.ctx.createOscillator(), gain = this.ctx.createGain();
+                osc.connect(gain); gain.connect(this.ctx.destination);
+                if(type === 'success') {
+                    osc.frequency.setValueAtTime(523.25, this.ctx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, this.ctx.currentTime + 0.1);
+                    osc.frequency.setValueAtTime(783.99, this.ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.4);
+                    osc.start(); osc.stop(this.ctx.currentTime + 0.4);
+                } else if(type === 'fail') {
+                    osc.type = 'sawtooth'; osc.frequency.setValueAtTime(150, this.ctx.currentTime);
+                    osc.frequency.linearRampToValueAtTime(100, this.ctx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.25);
+                    osc.start(); osc.stop(this.ctx.currentTime + 0.25);
+                }
+            }
+        };
+
+        function createCationSVG(ion, s = 1) {
+            const w = ION_W * s; const h = ion.charge * U * s; const tw = TAB_W * s; const stepH = h / ion.charge;
+            let d = `M 0 0 L ${w} 0`;
+            for (let i = 0; i < ion.charge; i++) {
+                const y = i * stepH;
+                d += ` L ${w} ${y + stepH*0.2} L ${w - tw} ${y + stepH*0.2} L ${w - tw} ${y + stepH*0.8} L ${w} ${y + stepH*0.8} L ${w} ${y + stepH}`;
+            }
+            d += ` L 0 ${h} Z`;
+            const symX = (w - tw) * 0.45;
+            return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="overflow:visible;">
+                <path d="${d}" fill="#7EB5A6" stroke="#5A8E7F" stroke-width="2" stroke-linejoin="round"/>
+                <text x="${symX}" y="${h/2-4*s}" text-anchor="middle" fill="white" font-weight="800" font-size="${15*s}" font-family="Cairo">${ion.symbol}</text>
+                <text x="${symX}" y="${h/2+12*s}" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="${10*s}" font-family="Cairo">${ion.charge}+</text>
+            </svg>`;
+        }
+
+        function createAnionSVG(ion, s = 1) {
+            const w = ION_W * s; const h = ion.charge * U * s; const tw = TAB_W * s; const stepH = h / ion.charge;
+            let d = `M ${w} 0 L 0 0`;
+            for (let i = 0; i < ion.charge; i++) {
+                const y = i * stepH;
+                d += ` L 0 ${y + stepH*0.2} L ${-tw} ${y + stepH*0.2} L ${-tw} ${y + stepH*0.8} L 0 ${y + stepH*0.8} L 0 ${y + stepH}`;
+            }
+            d += ` L ${w} ${h} Z`;
+            const symX = w * 0.55;
+            return `<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="overflow:visible;">
+                <path d="${d}" fill="#E27D60" stroke="#C46A4F" stroke-width="2" stroke-linejoin="round"/>
+                <text x="${symX}" y="${h/2-4*s}" text-anchor="middle" fill="white" font-weight="800" font-size="${15*s}" font-family="Cairo">${ion.symbol}</text>
+                <text x="${symX}" y="${h/2+12*s}" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-size="${10*s}" font-family="Cairo">${ion.charge}-</text>
+            </svg>`;
+        }
+
+        const game = {
+            currentLevel: 0,
+            score: 0,
+            loadLevel() {
+                app.reset();
+                const lvl = GAME_LEVELS[this.currentLevel];
+                document.getElementById('levelIndicator').textContent = `المرحلة ${this.currentLevel + 1} / ${GAME_LEVELS.length}`;
+                document.getElementById('targetChallenge').textContent = `مطلوب بناء: ${lvl.title}`;
+                document.getElementById('btnNext').style.display = 'none';
+                document.getElementById('formulaBox').className = 'formula-box';
+            },
+            checkMatch(builtName) {
+                const targetName = GAME_LEVELS[this.currentLevel].title;
+                const box = document.getElementById('formulaBox');
+                if (builtName === targetName) {
+                    box.className = 'formula-box balanced';
+                    document.getElementById('statusText').innerHTML = `🎉 <strong>أحسنت!</strong> ركّبت ${targetName} بنجاح علمي ولغوي دقيق!`;
+                    document.getElementById('btnNext').style.display = 'block';
+                    sound.play('success');
+                    app.fireConfetti();
+                    this.score += 10;
+                    document.getElementById('scoreBadge').textContent = `النقاط: ${this.score}`;
+                } else {
+                    box.className = 'formula-box wrong-match';
+                    document.getElementById('statusText').textContent = `⚠️ هذا مركب متزن (${builtName})، لكنه ليس المركب المطلوب في التحدي الحالي!`;
+                    sound.play('fail');
+                }
+            },
+            nextLevel() {
+                if (this.currentLevel < GAME_LEVELS.length - 1) {
+                    this.currentLevel++;
+                    this.loadLevel();
+                } else {
+                    alert(`🏆 تهانينا! أكملت كل المراحل بنجاح كيميائي ولغوي باهر! مجموع نقاطك: ${this.score}`);
+                    this.currentLevel = 0; this.score = 0;
+                    document.getElementById('scoreBadge').textContent = `النقاط: 0`;
+                    this.loadLevel();
+                }
+            },
+            showHint() {
+                const lvl = GAME_LEVELS[this.currentLevel];
+                const cat = IONS.cations.find(i => i.id === lvl.cation);
+                const ani = IONS.anions.find(i => i.id === lvl.anion);
+                alert(`💡 تلميح للمرحلة: تحتاج للبحث عن الكاتيون (${cat.symbol} شحنته ${cat.charge}+) والأنيون (${ani.symbol} شحنته ${ani.charge}-)`);
+            }
+        };
+
+        const app = {
+            state: { cations: [], anions: [] },
+            drag: { active: false, clone: null, data: null, type: null },
+            init() { this.renderLists(); this.bindEvents(); game.loadLevel(); },
+            renderLists() {
+                const mk = (ion, type) => {
+                    const svg = type==='cation' ? createCationSVG(ion, 0.6) : createAnionSVG(ion, 0.6);
+                    const chg = type==='cation' ? `${ion.charge}+` : `${ion.charge}-`;
+                    return `<div class="source-card ${type}" data-type="${type}" data-id="${ion.id}">${svg}<div class="info"><div class="name">${ion.name}</div><div class="charge">${chg}</div></div></div>`;
+                };
+                document.getElementById('anionList').innerHTML = IONS.anions.map(i => mk(i, 'anion')).join('');
+                document.getElementById('cationList').innerHTML = IONS.cations.map(i => mk(i, 'cation')).join('');
+            },
+            bindEvents() {
+                document.addEventListener('pointerdown', e => {
+                    const card = e.target.closest('.source-card'); if (!card) return;
+                    const type = card.dataset.type, id = card.dataset.id;
+                    const ion = IONS[type+'s'].find(i => i.id === id); if (!ion) return;
+                    sound.init();
+                    this.drag = { active: true, data: ion, type };
+                    this.drag.clone = document.createElement('div');
+                    this.drag.clone.className = 'drag-clone';
+                    this.drag.clone.innerHTML = type==='cation' ? createCationSVG(ion, 1) : createAnionSVG(ion, 1);
+                    document.body.appendChild(this.drag.clone);
+                    this.moveClone(e.clientX, e.clientY);
+                    card.style.opacity = '0.3'; e.preventDefault();
+                });
+                document.addEventListener('pointermove', e => { if (!this.drag.active) return; this.moveClone(e.clientX, e.clientY); e.preventDefault(); });
+                document.addEventListener('pointerup', e => {
+                    if (!this.drag.active) return;
+                    const target = document.elementFromPoint(e.clientX, e.clientY);
+                    if (target && target.closest('#wsBody')) this.addIon(this.drag.type, this.drag.data);
+                    this.cleanup(); e.preventDefault();
+                });
+                document.addEventListener('pointercancel', () => this.cleanup());
+            },
+            moveClone(x, y) { if (this.drag.clone) this.drag.clone.style.transform = `translate3d(${x}px, ${y}px, 0) scale(1.05)`; },
+            cleanup() {
+                if (this.drag.clone) this.drag.clone.remove();
+                document.querySelectorAll('.source-card').forEach(c => c.style.opacity = '1');
+                this.drag.active = false; this.drag.clone = null;
+            },
+            addIon(type, ion) {
+                this.state[type === 'cation' ? 'cations' : 'anions'].push({ ...ion, uid: Date.now() + Math.random() });
+                this.updateUI();
+            },
+            removeIon(type, uid) {
+                this.state[type === 'cation' ? 'cations' : 'anions'] = this.state[type === 'cation' ? 'cations' : 'anions'].filter(i => i.uid !== uid);
+                this.updateUI();
+            },
+            reset() { this.state = { cations: [], anions: [] }; this.updateUI(); document.getElementById('btnNext').style.display = 'none';},
+            updateUI() {
+                const renderStack = (ions, elId, type) => {
+                    const el = document.getElementById(elId); el.innerHTML = '';
+                    ions.forEach(ion => {
+                        const row = document.createElement('div'); row.className = `piece-row ${type}`;
+                        row.innerHTML = type==='cation' ? createCationSVG(ion, 1) : createAnionSVG(ion, 1);
+                        row.querySelector('svg').addEventListener('click', () => this.removeIon(type, ion.uid));
+                        el.appendChild(row);
+                    });
+                };
+                renderStack(this.state.cations, 'cationStack', 'cation');
+                renderStack(this.state.anions, 'anionStack', 'anion');
+                this.calcBalance();
+            },
+            calcBalance() {
+                const pos = this.state.cations.reduce((s,i)=>s+i.charge,0);
+                const neg = this.state.anions.reduce((s,i)=>s+Math.abs(i.charge),0);
+                const max = Math.max(pos,neg,1), ratio = Math.min(pos,neg)/max;
+                const balanced = pos>0 && neg>0 && pos===neg;
+                const fill=document.getElementById('meterFill'), text=document.getElementById('statusText');
+                const box=document.getElementById('formulaBox'), fText=document.getElementById('formulaText'), fName=document.getElementById('compoundName'), fNameEn=document.getElementById('compoundNameEn');
+                
+                fill.style.width=`${ratio*100}%`; fill.style.background=balanced?'#2CB67D':(ratio>0.5?'#FFD166':'#FF6B81');
+                
+                if (!pos && !neg) {
+                    text.textContent = 'اسحب الأيونات المناسبة لبناء المركب المطلوب بشكل متزن هندسياً'; 
+                    fText.innerHTML='؟'; fName.textContent='اسحب الأيونات لتكوين المركب'; fNameEn.textContent=''; box.className = 'formula-box'; return;
+                }
+                if (balanced) {
+                    this.makeFormula();
+                } else if (pos > neg) {
+                    text.textContent=`⚖️ شحنات موجبة فائضة (${pos}+ > ${neg}−) ← أضف أنيونات (من اليمين)`; box.className = 'formula-box';
+                    fText.innerHTML='⏳'; fName.textContent='الدارة غير متزنة؛ أضف أنيونات'; fNameEn.textContent='';
+                } else {
+                    text.textContent=`⚖️ شحنات سالبة فائضة (${neg}− > ${pos}+) ← أضف كاتيونات (من اليسار)`; box.className = 'formula-box';
+                    fText.innerHTML='⏳'; fName.textContent='الدارة غير متزنة؛ أضف كاتيونات'; fNameEn.textContent='';
+                }
+            },
+            makeFormula() {
+                if (!this.state.cations.length || !this.state.anions.length) return;
+                const cm = arr => arr.reduce((a,i)=>{a[i.id]=(a[i.id]||0)+1;return a;},{});
+                const cc=cm(this.state.cations), ac=cm(this.state.anions);
+                const gcd=(a,b)=>b===0?a:gcd(b,a%b);
+                const g=[...Object.values(cc),...Object.values(ac)].reduce((a,v)=>gcd(a,v));
+                let html='';
+                const part=(map,type)=>{Object.entries(map).forEach(([id,cnt])=>{const ion=IONS[type+'s'].find(i=>i.id===id);const s=cnt/g;html+=ion.poly&&s>1?`(${ion.symbol})<sub>${s}</sub>`:(s>1?`${ion.symbol}<sub>${s}</sub>`:ion.symbol);});};
+                part(cc,'cation'); part(ac,'anion');
+                const fCat=IONS.cations.find(i=>i.id in cc), fAni=IONS.anions.find(i=>i.id in ac);
+                
+                const builtName = `${fAni.name} ${fCat.nameCompound}`;
+                document.getElementById('formulaText').innerHTML=html;
+                document.getElementById('compoundName').textContent=builtName;
+                document.getElementById('compoundNameEn').textContent=`${fCat.nameEn} ${fAni.nameEn}`;
+                
+                game.checkMatch(builtName);
+            },
+            fireConfetti() {
+                const box=document.getElementById('formulaBox').getBoundingClientRect();
+                const cx=box.left+box.width/2, cy=box.top+box.height/2;
+                const colors=['#2CB67D','#FFD166','#FF6B81','#7EB5A6','#E27D60','#6C63FF'];
+                for(let i=0;i<30;i++){const el=document.createElement('div');el.className='confetti';
+                el.style.background=colors[~~(Math.random()*colors.length)];el.style.left=cx+'px';el.style.top=cy+'px';
+                el.style.setProperty('--tx',(Math.random()-0.5)*140+'px');el.style.setProperty('--ty',-(Math.random()*130+40)+'px');
+                el.style.setProperty('--r',Math.random()*360+'deg');document.body.appendChild(el);setTimeout(()=>el.remove(),1000);}
+            }
+        };
+        document.addEventListener('DOMContentLoaded', () => app.init());
+    </script></body></html>
